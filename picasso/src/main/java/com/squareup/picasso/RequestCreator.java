@@ -206,6 +206,12 @@ public class RequestCreator {
     return this;
   }
 
+  /** Set the original image size. */
+  public RequestCreator originalSize(int width, int height) {
+    data.originalSize(width, height);
+    return this;
+  }
+
   /** Resize the image to the specified dimension size. */
   public RequestCreator resizeDimen(int targetWidthResId, int targetHeightResId) {
     Resources resources = picasso.context.getResources();

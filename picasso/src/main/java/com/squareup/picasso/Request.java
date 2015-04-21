@@ -54,6 +54,10 @@ public final class Request {
   public final String stableKey;
   /** List of custom transformations to be applied after the built-in transformations. */
   public final List<Transformation> transformations;
+  /** Original image width. */
+  public final int width;
+  /** Original image height. */
+  public final int height;
   /** Target image width for resizing. */
   public final int targetWidth;
   /** Target image height for resizing. */
@@ -85,9 +89,9 @@ public final class Request {
   public final Priority priority;
 
   private Request(Uri uri, int resourceId, String stableKey, List<Transformation> transformations,
-      int targetWidth, int targetHeight, boolean centerCrop, boolean centerInside,
-      boolean onlyScaleDown, float rotationDegrees, float rotationPivotX, float rotationPivotY,
-      boolean hasRotationPivot, Bitmap.Config config, Priority priority) {
+      int width, int height, int targetWidth, int targetHeight, boolean centerCrop,
+      boolean centerInside, boolean onlyScaleDown, float rotationDegrees, float rotationPivotX,
+      float rotationPivotY, boolean hasRotationPivot, Bitmap.Config config, Priority priority) {
     this.uri = uri;
     this.resourceId = resourceId;
     this.stableKey = stableKey;
@@ -96,6 +100,8 @@ public final class Request {
     } else {
       this.transformations = unmodifiableList(transformations);
     }
+    this.width = width;
+    this.height = height;
     this.targetWidth = targetWidth;
     this.targetHeight = targetHeight;
     this.centerCrop = centerCrop;
@@ -167,6 +173,10 @@ public final class Request {
     return Integer.toHexString(resourceId);
   }
 
+  public boolean hasOriginalSize() {
+    return width != 0 || height != 0;
+  }
+
   public boolean hasSize() {
     return targetWidth != 0 || targetHeight != 0;
   }
@@ -192,6 +202,8 @@ public final class Request {
     private Uri uri;
     private int resourceId;
     private String stableKey;
+    private int width;
+    private int height;
     private int targetWidth;
     private int targetHeight;
     private boolean centerCrop;
@@ -225,6 +237,8 @@ public final class Request {
       uri = request.uri;
       resourceId = request.resourceId;
       stableKey = request.stableKey;
+      width = request.width;
+      height = request.height;
       targetWidth = request.targetWidth;
       targetHeight = request.targetHeight;
       centerCrop = request.centerCrop;
@@ -243,6 +257,10 @@ public final class Request {
 
     boolean hasImage() {
       return uri != null || resourceId != 0;
+    }
+
+    boolean hasOriginalSize() {
+      return width != 0 || height != 0;
     }
 
     boolean hasSize() {
@@ -287,6 +305,15 @@ public final class Request {
      */
     public Builder stableKey(String stableKey) {
       this.stableKey = stableKey;
+      return this;
+    }
+
+    /**
+     * Set the original image size.
+     */
+    public Builder originalSize(int width, int height) {
+      this.width = width;
+      this.height = height;
       return this;
     }
 
@@ -465,9 +492,9 @@ public final class Request {
       if (priority == null) {
         priority = Priority.NORMAL;
       }
-      return new Request(uri, resourceId, stableKey, transformations, targetWidth, targetHeight,
-          centerCrop, centerInside, onlyScaleDown, rotationDegrees, rotationPivotX, rotationPivotY,
-          hasRotationPivot, config, priority);
+      return new Request(uri, resourceId, stableKey, transformations, width, height, targetWidth,
+          targetHeight, centerCrop, centerInside, onlyScaleDown, rotationDegrees, rotationPivotX,
+          rotationPivotY, hasRotationPivot, config, priority);
     }
   }
 }
