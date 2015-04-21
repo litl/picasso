@@ -129,14 +129,19 @@ public abstract class RequestHandler {
    * {@link Request}, only instantiating them if needed.
    */
   static BitmapFactory.Options createBitmapOptions(Request data) {
-    final boolean justBounds = data.hasSize();
+    final boolean hasOriginalSize = data.hasOriginalSize();
+    final boolean justBounds = !hasOriginalSize && data.hasSize();
     final boolean hasConfig = data.config != null;
     BitmapFactory.Options options = null;
-    if (justBounds || hasConfig) {
+    if (hasOriginalSize || justBounds || hasConfig) {
       options = new BitmapFactory.Options();
       options.inJustDecodeBounds = justBounds;
       if (hasConfig) {
         options.inPreferredConfig = data.config;
+      }
+      if (hasOriginalSize && data.hasSize()) {
+        calculateInSampleSize(data.targetWidth, data.targetHeight, data.width, data.height, options,
+                data);
       }
     }
     return options;
